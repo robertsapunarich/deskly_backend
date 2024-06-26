@@ -20,18 +20,18 @@ async def read_main():
 
 
 @app.get("/tickets")
-async def read_tickets(status: str | None = None):
+async def read_tickets(status: str | None = None) -> list[Ticket]:
   if status:
     return [ticket for ticket in fake_db.values() if ticket.status == status]
   return list(fake_db.values())
 
 
-@app.put("/tickets/{ticket_id}")
-async def update_ticket(ticket_id: int, ticket_params: Ticket):
+@app.put("/ticket/{ticket_id}")
+async def update_ticket(ticket_id: int, ticket_params: Ticket) -> Ticket:
   try:
     if fake_db[ticket_id]:
       fake_db[ticket_id] = ticket_params
-      return {"ticket_id": ticket_id, "ticket": ticket_params}
+      return fake_db[ticket_id]
   except KeyError:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found")
 

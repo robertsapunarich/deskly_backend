@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from main import app
+from app.main import app
 
 client = TestClient(app)
 
@@ -29,11 +29,11 @@ def test_read_tickets_with_status():
   ]
 
 def test_update_ticket():
-  response = client.put("/tickets/1", json={"title": "Fix all the bugs", "priority": "high", "status": "closed"})
+  response = client.put("/ticket/1", json={"title": "Fix all the bugs", "priority": "high", "status": "closed"})
   assert response.status_code == 200
-  assert response.json() == {"ticket_id": 1, "ticket": {"title": "Fix all the bugs", "priority": "high", "status": "closed"}}
+  assert response.json() == {"title": "Fix all the bugs", "priority": "high", "status": "closed"}
 
 def test_update_ticket_not_found():
-  response = client.put("/tickets/4", json={"title": "Fix all the bugs", "priority": "high", "status": "open"})
+  response = client.put("/ticket/4", json={"title": "Fix all the bugs", "priority": "high", "status": "open"})
   assert response.status_code == 404
   assert response.json() == {"detail": "Ticket not found"}

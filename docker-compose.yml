@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    ports: 
+      - 5432:5432
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: passpass
+      POSTGRES_DB: deskly_dev
+      # PGDATA: /var/lib/postgresql/data/deskly_dev
+    volumes:
+      - ./data:/var/lib/postgresql/data
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+volumes:
+  data:
