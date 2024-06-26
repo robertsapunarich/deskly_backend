@@ -1,21 +1,21 @@
 from pydantic import BaseModel
 
-class TicketBase(BaseModel):
+class TaskBase(BaseModel):
   title: str
   priority: str
   status: str
 
-class TicketCreate(TicketBase):
+class TaskCreate(TaskBase):
   pass
 
 
-class Ticket(TicketBase):
+class Task(TaskBase):
   id: int
 
   class Config:
     orm_mode = True
 
-class TicketUpdate(TicketBase):
+class TaskUpdate(TaskBase):
   pass
 
 class UserBase(BaseModel):

@@ -1,37 +1,48 @@
-from fastapi import FastAPI, status, HTTPException
+from fastapi import Depends, FastAPI, status, HTTPException
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from schemas import schemas
+from crud import crud
+from db.database import SessionLocal, engine
+from db import models
 
-class Ticket(BaseModel):
-  title: str
-  priority: str
-  status: str
+# class Ticket(BaseModel):
+#   title: str
+#   priority: str
+#   status: str
   
-fake_db = {
-  1: Ticket(title="Fix all the bugs", priority="high", status="open"),
-  2: Ticket(title="Write some docs", priority="medium", status="open"), 
-  3: Ticket(title="Release the product", priority="high", status="closed"),
-}
+# fake_db = {
+#   1: Ticket(title="Fix all the bugs", priority="high", status="open"),
+#   2: Ticket(title="Write some docs", priority="medium", status="open"), 
+#   3: Ticket(title="Release the product", priority="high", status="closed"),
+# }
 
 app = FastAPI()
+
+# Dependency
+def get_db():
+  db = SessionLocal()
+  try:
+    yield db
+  finally:
+    db.close()
 
 @app.get("/")
 async def read_main():
   return {"message": "Hello, World!"}
 
 
-@app.get("/tickets")
-async def read_tickets(status: str | None = None) -> list[Ticket]:
+@app.get("/tasks", response_model=list[schemas.Task])
+async def read_tasks(status: str | None = None, db: Session = Depends(get_db)) -> list[schemas.Task]:
   if status:
-    return [ticket for ticket in fake_db.values() if ticket.status == status]
-  return list(fake_db.values())
+    db_tasks = crud.get_tasks_by_status(db, status)
+  else:
+    db_tasks = crud.get_tasks(db)
+  return list(db_tasks)
 
 
-@app.put("/ticket/{ticket_id}")
-async def update_ticket(ticket_id: int, ticket_params: Ticket) -> Ticket:
-  try:
-    if fake_db[ticket_id]:
-      fake_db[ticket_id] = ticket_params
-      return fake_db[ticket_id]
-  except KeyError:
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Ticket not found")
+@app.put("/task/{task_id}", response_model=schemas.Task)
+async def update_task(task_id: int, task_params: schemas.TaskUpdate) -> schemas.Task:
+    task = crud.update_task(task_id, task_params)
+    return task
 

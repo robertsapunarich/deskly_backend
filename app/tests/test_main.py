@@ -1,6 +1,16 @@
 from fastapi.testclient import TestClient
 from app.main import app
+from sqlalchemy import create_engine
 
+# Create a test database
+engine = create_engine("sqlite:///./test.db")
+with engine.connect() as connection:
+  connection.execute("CREATE TABLE tickets (id INTEGER PRIMARY KEY, title TEXT, priority TEXT, status TEXT)")
+  connection.execute("INSERT INTO tickets (title, priority, status) VALUES ('Fix all the bugs', 'high', 'open')")
+  connection.execute("INSERT INTO tickets (title, priority, status) VALUES ('Write some docs', 'medium', 'open')")
+  connection.execute("INSERT INTO tickets (title, priority, status) VALUES ('Release the product', 'high', 'closed')")
+
+# Create a test client
 client = TestClient(app)
 
 
