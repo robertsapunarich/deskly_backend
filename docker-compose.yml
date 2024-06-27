@@ -17,6 +17,8 @@ services:
       context: .
       dockerfile: Dockerfile
     restart: always
+    environment:
+      - DB_URL=postgresql://dev:passpass@db:5432/deskly_dev
     ports:
       - 8000:8000
     depends_on:

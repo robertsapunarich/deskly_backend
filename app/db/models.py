@@ -21,14 +21,14 @@ class Assignee(User):
       "polymorphic_identity": "assignees",
     }
 
-    tasks = relationship("Task", back_populates="assignee")
+    tasks = relationship("Task", back_populates="assignee", foreign_keys="Task.assignee_id")
 
 class Customer(User):
     __mapper_args__ = {
       "polymorphic_identity": "customers",
     }
 
-    tasks = relationship("Task", back_populates="customer")
+    tasks = relationship("Task", back_populates="customer", foreign_keys="Task.customer_id")
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -40,9 +40,10 @@ class Task(Base):
     assignee_id = Column(Integer, ForeignKey("users.id"))
     customer_id = Column(Integer, ForeignKey("users.id"))
 
-    assignee = relationship("Assignee", back_populates="tasks")
-    customer = relationship("Customer", back_populates="tasks")
+    assignee = relationship("Assignee", back_populates="tasks", foreign_keys=[assignee_id])
+    customer = relationship("Customer", back_populates="tasks", foreign_keys=[customer_id])
 
+    thread = relationship("Thread", back_populates="task", uselist=False)
 
 class Thread(Base):
     __tablename__ = "threads"
@@ -51,7 +52,7 @@ class Thread(Base):
     title = Column(String)
     task_id = Column(Integer, ForeignKey("tasks.id"))
 
-    task = relationship("Task", back_populates="threads")
+    task = relationship("Task", back_populates="thread")
     messages = relationship("Message", back_populates="thread")
 
 class Message(Base):
