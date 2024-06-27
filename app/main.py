@@ -59,3 +59,7 @@ async def update_task(task_id: int, task_params: schemas.TaskUpdate, db: Session
     task = crud.update_task(db, task_id, task_params)
     return task
 
+@app.get("/assignees", response_model=list[schemas.Assignee])
+async def read_assignees(db: Session = Depends(get_db)) -> list[schemas.Assignee]:
+  db_assignees = crud.get_assignees(db)
+  return list(db_assignees)

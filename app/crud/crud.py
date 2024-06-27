@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import joinedload
 from schemas import schemas
-from db.models import Task
+from db.models import Task, Assignee
 
 def get_task(db: Session, task_id: int) -> Task:
   return db.query(Task).filter(Task.id == task_id).first()
@@ -25,6 +25,10 @@ def update_task(db: Session, task_id: int, task: schemas.TaskUpdate) -> Task:
   db_task.title = task.title
   db_task.priority = task.priority
   db_task.status = task.status
+  db_task.assignee_id = task.assignee.id
   db.commit()
   db.refresh(db_task)
   return db_task
+
+def get_assignees(db: Session, skip: int = 0, limit: int = 100) -> list[schemas.Assignee]:
+  return db.query(Assignee).offset(skip).limit(limit).all()

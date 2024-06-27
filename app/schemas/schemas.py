@@ -45,6 +45,7 @@ class TaskCreate(TaskBase):
     pass
 
 class TaskUpdate(TaskBase):
+    assignee: Assignee
     pass
 
 class Task(TaskBase):
