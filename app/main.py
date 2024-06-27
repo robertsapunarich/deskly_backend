@@ -5,6 +5,7 @@ from schemas import schemas
 from crud import crud
 from db.database import SessionLocal, engine
 from db import models
+from fastapi.middleware.cors import CORSMiddleware
 
 # class Ticket(BaseModel):
 #   title: str
@@ -18,6 +19,18 @@ from db import models
 # }
 
 app = FastAPI()
+
+origins = [
+    "*",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Dependency
 def get_db():
@@ -42,7 +55,7 @@ async def read_tasks(status: str | None = None, db: Session = Depends(get_db)) -
 
 
 @app.put("/task/{task_id}", response_model=schemas.Task)
-async def update_task(task_id: int, task_params: schemas.TaskUpdate) -> schemas.Task:
-    task = crud.update_task(task_id, task_params)
+async def update_task(task_id: int, task_params: schemas.TaskUpdate, db: Session = Depends(get_db)) -> schemas.Task:
+    task = crud.update_task(db, task_id, task_params)
     return task
 

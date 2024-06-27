@@ -20,14 +20,27 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.create_table(
-        "users",
+        "assignees",
         sa.MetaData(),
         sa.Column("id", sa.Integer, primary_key=True, index=True),
         sa.Column("email", sa.String, unique=True, index=True),
         sa.Column("hashed_password", sa.String, nullable=False),
-        sa.Column("type", sa.String, nullable=False),
+    )
+
+    op.create_table(
+        "customers",
+        sa.MetaData(),
+        sa.Column("id", sa.Integer, primary_key=True, index=True),
+        sa.Column("email", sa.String, unique=True, index=True),
+        sa.Column("hashed_password", sa.String, nullable=False),
     )
     
+    op.create_table(
+        "threads",
+        sa.MetaData(),
+        sa.Column("id", sa.Integer, primary_key=True, index=True),
+        sa.Column("title", sa.String),
+    )
 
     op.create_table(
         "tasks",
@@ -36,16 +49,9 @@ def upgrade() -> None:
         sa.Column("title", sa.String),
         sa.Column("priority", sa.String),
         sa.Column("status", sa.String, default="open"),
-        sa.Column("assignee_id", sa.Integer, sa.ForeignKey("users.id")),
-        sa.Column("customer_id", sa.Integer, sa.ForeignKey("users.id")),
-    )
-
-    op.create_table(
-        "threads",
-        sa.MetaData(),
-        sa.Column("id", sa.Integer, primary_key=True, index=True),
-        sa.Column("title", sa.String),
-        sa.Column("task_id", sa.Integer, sa.ForeignKey("tasks.id")),
+        sa.Column("assignee_id", sa.Integer, sa.ForeignKey("assignees.id")),
+        sa.Column("customer_id", sa.Integer, sa.ForeignKey("customers.id")),
+        sa.Column("thread_id", sa.Integer, sa.ForeignKey("threads.id")),
     )
 
     op.create_table(
@@ -59,7 +65,8 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    op.drop_table("tasks")
+    op.drop_table("customers")
+    op.drop_table("assignees")
     op.drop_table("messages")
     op.drop_table("threads")
-    op.drop_table("tasks")
-    op.drop_table("users")
