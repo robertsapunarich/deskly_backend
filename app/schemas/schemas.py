@@ -24,6 +24,17 @@ class Assignee(AssigneeBase):
     class Config:
         orm_mode = True
 
+class MessageBase(BaseModel):
+    body: str
+    subject: str
+    thread_id: int
+
+class Message(MessageBase):
+    id: int
+
+    class Config:
+        orm_mode = True
+
 class ThreadBase(BaseModel):
     title: str
 
@@ -32,7 +43,7 @@ class ThreadCreate(ThreadBase):
 
 class Thread(ThreadBase):
     id: int
-
+    messages: list[Message] = []
     class Config:
         orm_mode = True
 
